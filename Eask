@@ -6,6 +6,8 @@
 (keywords "text")
 
 (package-file "unicode-inspector.el")
+(files
+ "unicode-inspector-blocks.el")
 
 (script "test" "echo \"Error: no test specified\" && exit 1")
 

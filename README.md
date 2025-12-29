@@ -21,3 +21,6 @@ This package is licensed under [GNU General Public License, version 3](https://w
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+## Unicode Data Notice
+
+[`unicode-inspector-blocks.el`](unicode-inspector-blocks.el) is derived from the Unicode data and is subject to the [Unicode Terms of Use](https://www.unicode.org/terms_of_use.html) and the [License](https://www.unicode.org/license.txt).
