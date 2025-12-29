@@ -34,9 +34,13 @@
 ;; with codepoint, UTF-8/UTF-16LE bytes, name, category, and block.
 
 ;;; Code:
-(require 'cl-lib)
+(require 'browse-url)
 (require 'emoji)
+(require 'unicode-inspector-blocks)
 (require 'vui)
+(eval-when-compile
+  (require 'cl-lib)
+  (require 'pcase))
 
 (defgroup unicode-inspector nil
   "Text to inspect Unicode properties."
@@ -59,8 +63,16 @@
   (or (get-char-code-property char 'name) "UNASSIGNED"))
 
 (defun unicode-inspector--char-block (char)
-  "Return Unicode block name for CHAR."
-  "TBD")
+  "Return a block cell for CHAR with a chart PDF link."
+  (let ((range (unicode-inspector-blocks-range-for char)))
+    (if (not range)
+        "No_Block"
+      (pcase-let ((`(,start ,_ ,name) range))
+        (vui-button name
+                    :on-click (lambda ()
+                                (browse-url (unicode-inspector-blocks-url start)))
+                    :help-echo (unicode-inspector-blocks-url start)
+                    :no-decoration t)))))
 
 (defun unicode-inspector--char-category (char)
   "Return general category for CHAR."
