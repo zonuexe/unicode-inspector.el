@@ -46,6 +46,10 @@
   "Text to inspect Unicode properties."
   :group 'text)
 
+(defcustom unicode-inspector-unique-input nil
+  "When non-nil, inspect each character only once."
+  :type 'boolean)
+
 (defvar unicode-inspector--buffer-name "*Unicode Inspector*"
   "Buffer name for the Unicode Inspector UI.")
 
@@ -90,11 +94,15 @@
 
 (defun unicode-inspector--rows-from-input (text)
   "Return table rows for TEXT split by lines."
-  (let ((lines (split-string (or text "") "\n" nil)))
+  (let ((lines (split-string (or text "") "\n" nil))
+        (seen (when unicode-inspector-unique-input (make-hash-table :test 'eq))))
     (cl-loop for line in lines
              when (not (string= line ""))
-             append (mapcar #'unicode-inspector--char-row
-                            (string-to-list line)))))
+             append (cl-loop for char across line
+                             when (or (not seen)
+                                      (unless (gethash char seen)
+                                        (puthash char t seen)))
+                             collect (unicode-inspector--char-row char)))))
 
 (defun unicode-inspector--table (text)
   "Render the inspector table for TEXT."

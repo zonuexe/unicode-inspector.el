@@ -2,6 +2,21 @@
 
 `unicode-inspector.el` is an Emacs package that provides detailed information about Unicode characters. It allows you to interactively inspect strings and view their code points, names, and other properties for each character.
 
+## Customization
+
+You can customize the behavior of `unicode-inspector` by adding the following configuration to your [Emacs Initialization File][]:
+
+```el
+(with-eval-after-load 'unicode-inspector
+  (setopt unicode-inspector-unique-input t))
+```
+
+[Emacs Initialization File]: https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html
+
+### `unicode-inspector-unique-input`
+
+If non-nil, the inspector filters out duplicate characters from the input and displays each unique character only once.
+
 ## Copyright
 
 This package is licensed under [GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0).
