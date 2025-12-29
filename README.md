@@ -2,6 +2,28 @@
 
 `unicode-inspector.el` is an Emacs package that provides detailed information about Unicode characters. It allows you to interactively inspect strings and view their code points, names, and other properties for each character.
 
+## Requirements
+
+This package requires the following:
+
+* **Emacs 29.1** or later.
+* [vui.el][]: A declarative, component-based UI framework for Emacs.
+
+> [!NOTE]
+> Since vui.el is hosted on MELPA, please ensure that you have [MELPA](https://melpa.org/#/getting-started) added to your package-archives in your Emacs configuration to resolve this dependency.
+
+[vui.el]: https://github.com/d12frosted/vui.el
+
+## Installation
+
+You can install `unicode-inspector` using `package-vc-install` (available in Emacs 29.1 and later). Run the following code in your Emacs:
+
+```el
+(package-vc-install
+ '(unicode-inspector :url "https://github.com/zonuexe/unicode-inspector.el.git"
+                     :main-file "unicode-inspector.el"))
+```
+
 ## Customization
 
 You can customize the behavior of `unicode-inspector` by adding the following configuration to your [Emacs Initialization File][]:
