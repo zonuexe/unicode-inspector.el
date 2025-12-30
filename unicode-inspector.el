@@ -108,6 +108,10 @@ When nil, no face is applied."
                    (`(,pdf-label . ,pdf-face) (unicode-inspector--pdf-icon)))
         (vui-hstack
          :spacing 1
+         (vui-button name
+           :on-click (lambda ()
+                       (unicode-inspector--open-block-table start end name))
+           :no-decoration t)
          (vui-button pdf-label
            :face pdf-face
            :on-click (lambda ()
@@ -115,6 +119,73 @@ When nil, no face is applied."
            :help-echo (unicode-inspector-blocks-url start)
            :no-decoration t)))
     "No_Block"))
+
+(define-derived-mode unicode-inspector-block-table-mode special-mode "Unicode-Block-Table"
+  "Major mode for Unicode block table buffers."
+  (setq-local truncate-lines t))
+
+(defun unicode-inspector--block-table-buffer-name (name)
+  "Return a buffer name for block table NAME."
+  (format "*Unicode Block Table* %s" name))
+
+(defun unicode-inspector--block-table-columns (start end)
+  "Return column bases between START and END."
+  (let ((start-col (ash start -4))
+        (end-col (ash end -4)))
+    (cl-loop for col from start-col to end-col collect col)))
+
+(defun unicode-inspector--block-table-cell (codepoint)
+  "Return the cell vnode for CODEPOINT."
+  (if (characterp codepoint)
+      (if unicode-inspector-block-table-char-face
+          (vui-text (string codepoint) :face unicode-inspector-block-table-char-face)
+        (string codepoint))
+    " "))
+
+(defun unicode-inspector--block-table-heading (name start end)
+  "Return the heading vnode for block table NAME START END."
+  (let* ((label (format "%s (%04X..%04X)" name start end))
+         (pdf (unicode-inspector--pdf-icon))
+         (pdf-label (car pdf))
+         (pdf-face (cdr pdf)))
+    (vui-hstack
+     :spacing 1
+     (vui-text label :face 'bold)
+     (vui-button pdf-label
+                 :face pdf-face
+                 :on-click (lambda ()
+                             (browse-url (unicode-inspector-blocks-url start)))
+                 :help-echo (unicode-inspector-blocks-url start)
+                 :no-decoration t))))
+
+(defun unicode-inspector--block-table-vnode (start end name)
+  "Return a VUI table vnode for START..END with block NAME."
+  (let* ((row-bases (unicode-inspector--block-table-columns start end))
+         (col-nibbles (number-sequence 0 15))
+         (columns (cons (list :header "" :width 6)
+                        (mapcar (lambda (col)
+                                  (list :header (format "%X" col) :width 4 :align :center))
+                                col-nibbles)))
+         (rows (mapcar (lambda (row-base)
+                         (cons (format "%04X" row-base)
+                               (mapcar (lambda (col)
+                                         (let ((codepoint (+ (ash row-base 4) col)))
+                                           (if (<= start codepoint end)
+                                               (unicode-inspector--block-table-cell codepoint)
+                                             "")))
+                                       col-nibbles)))
+                       row-bases)))
+    (vui-vstack
+     :spacing 1
+     (unicode-inspector--block-table-heading name start end)
+     (vui-table :columns columns :rows rows))))
+
+(defun unicode-inspector--open-block-table (start end name)
+  "Open a Unicode block table for START..END with block NAME."
+  (let ((buf (get-buffer-create (unicode-inspector--block-table-buffer-name name))))
+    (with-current-buffer buf
+      (vui-render (unicode-inspector--block-table-vnode start end name)))
+    (pop-to-buffer buf)))
 
 (defun unicode-inspector--char-category (char)
   "Return general category for CHAR."
