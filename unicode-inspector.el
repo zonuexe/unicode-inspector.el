@@ -327,7 +327,8 @@ Uses direct replacement (not `display' properties) to avoid table misalignment."
     :rows (unicode-inspector--block-list-rows start end query))))
 
 (defun unicode-inspector--open-block-list (start end name &optional initial-query)
-  "Open a Unicode block codepoint list for START..END with NAME."
+  "Open a Unicode block codepoint list for START..END with NAME.
+INITIAL-QUERY seeds the Name filter."
   (let* ((buf-name (unicode-inspector--block-list-buffer-name name))
          (buf (get-buffer buf-name)))
     (when (buffer-live-p buf)
