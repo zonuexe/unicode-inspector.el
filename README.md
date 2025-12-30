@@ -47,6 +47,10 @@ Controls the face applied to the Char column. Set to `nil` to disable styling.
 
 Controls the face applied to characters in block tables. Set to `nil` to disable styling.
 
+### `unicode-inspector-show-trailing-whitespace`
+
+Controls `show-trailing-whitespace` in Unicode Inspector buffers. Default is `:hide`.
+
 ## Copyright
 
 This package is licensed under [GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0).

@@ -65,6 +65,13 @@ When nil, no face is applied."
   :type '(choice (const :tag "None" nil) face)
   :group 'unicode-inspector)
 
+(defcustom unicode-inspector-show-trailing-whitespace :hide
+  "Override `show-trailing-whitespace' in Unicode Inspector buffers."
+  :type '(choice (const :tag "Use default" nil)
+                 (const :tag "Show" t)
+                 (const :tag "Hide" :hide))
+  :group 'unicode-inspector)
+
 (defvar unicode-inspector--pdf-icon-cache nil
   "Cached (label . face) for the PDF button.")
 
@@ -79,7 +86,12 @@ When nil, no face is applied."
   "Minor mode for Unicode Inspector buffers."
   :init-value nil
   :lighter " Unicode-Inspector"
-  :keymap unicode-inspector-mode-map)
+  :keymap unicode-inspector-mode-map
+  (if unicode-inspector-mode
+      (when unicode-inspector-show-trailing-whitespace
+        (setq show-trailing-whitespace
+              (not (eq unicode-inspector-show-trailing-whitespace :hide))))
+    (setq show-trailing-whitespace (default-value 'show-trailing-whitespace))))
 
 (defun unicode-inspector--bytes-to-hex (bytes)
   "Format BYTES as a space-separated hex string."
