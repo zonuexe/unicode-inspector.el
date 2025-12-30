@@ -72,6 +72,13 @@ When nil, no face is applied."
                  (const :tag "Hide" :hide))
   :group 'unicode-inspector)
 
+(defcustom unicode-inspector-control-replacements
+  '((?\t . "␉"))
+  "Alist of character replacements used for display.
+Uses direct replacement (not `display' properties) to avoid table misalignment."
+  :type '(alist :key-type character :value-type string)
+  :group 'unicode-inspector)
+
 (defvar unicode-inspector--pdf-icon-cache nil
   "Cached (label . face) for the PDF button.")
 
@@ -112,6 +119,7 @@ When nil, no face is applied."
   "Return display string for CHAR, mapping ASCII controls to symbols."
   (let ((base (string char)))
     (cond
+     ((cdr-safe (assq char unicode-inspector-control-replacements)))
      ((<= char #x1F)
       (propertize base 'display (string (+ #x2400 char))))
      ((= char #x7F)

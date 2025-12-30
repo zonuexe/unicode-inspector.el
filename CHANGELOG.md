@@ -8,6 +8,7 @@ All notable changes of the `unicode-inspector.el` are documented in this file us
 
 * Renamed the block codepoint list command to `unicode-inspector-block-list`.
 * Re-opening existing inspector/list buffers now reuses or recreates buffers to avoid widget errors.
+* Use direct character replacement (not `display` properties) to avoid table misalignment.
 
 ## [2025-12-30] 0.0.3
 
