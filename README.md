@@ -2,6 +2,8 @@
 
 `unicode-inspector.el` is an Emacs package that provides detailed information about Unicode characters. It allows you to interactively inspect strings and view their code points, names, and other properties for each character.
 
+![](doc/anime.gif)
+
 ## Requirements
 
 This package requires the following:
