@@ -79,6 +79,38 @@ Uses direct replacement (not `display' properties) to avoid table misalignment."
   :type '(alist :key-type character :value-type string)
   :group 'unicode-inspector)
 
+(defcustom unicode-inspector-display-replacements
+  '((?\s . "␠")
+    (#x00AD . "[SHY]")
+    (#x034F . "[CGJ]")
+    (#x180E . "[MVS]")
+    (#x200B . "[ZWSP]")
+    (#x200C . "[ZWNJ]")
+    (#x200D . "[ZWJ]")
+    (#x200E . "[LRM]")
+    (#x200F . "[RLM]")
+    (#x2028 . "[LS]")
+    (#x2029 . "[PS]")
+    (#x202A . "[LRE]")
+    (#x202B . "[RLE]")
+    (#x202C . "[PDF]")
+    (#x202D . "[LRO]")
+    (#x202E . "[RLO]")
+    (#x202F . "[NNBSP]")
+    (#x2060 . "[WJ]")
+    (#x2061 . "[f()]")
+    (#x2062 . "[×]")
+    (#x2063 . "[,]")
+    (#x2064 . "[+]")
+    (#x2066 . "[LRI]")
+    (#x2067 . "[RLI]")
+    (#x2068 . "[FSI]")
+    (#x2069 . "[PDI]")
+    (#xFEFF . "[BOM]"))
+  "Alist of display replacements using `display' properties."
+  :type '(alist :key-type character :value-type string)
+  :group 'unicode-inspector)
+
 (defvar unicode-inspector--pdf-icon-cache nil
   "Cached (label . face) for the PDF button.")
 
@@ -116,21 +148,29 @@ Uses direct replacement (not `display' properties) to avoid table misalignment."
       "UNASSIGNED"))
 
 (defun unicode-inspector--display-char (char)
-  "Return display string for CHAR, mapping ASCII controls to symbols."
+  "Return display string for CHAR, mapping replacements if configured."
   (let ((base (string char)))
-    (cond
-     ((cdr-safe (assq char unicode-inspector-control-replacements)))
-     ((<= char #x1F)
-      (propertize base 'display (string (+ #x2400 char))))
-     ((= char #x7F)
-      (propertize base 'display (string #x2421)))
-     (t base))))
+    (let ((display (cdr (assq char unicode-inspector-display-replacements)))
+          (direct (cdr (assq char unicode-inspector-control-replacements))))
+      (cond
+       (display (propertize base 'display display))
+       (direct direct)
+       (t base)))))
+
+(defun unicode-inspector--display-face (label default-face)
+  "Return face for LABEL, overriding DEFAULT-FACE when LABEL is long."
+  (let* ((display (and (stringp label) (get-text-property 0 'display label)))
+         (effective (if (stringp display) display label)))
+    (if (>= (length effective) 3)
+        'font-lock-escape-face
+      default-face)))
 
 (defun unicode-inspector--char-cell (char)
   "Return the Char column cell for CHAR."
-  (let ((label (unicode-inspector--display-char char)))
-    (if unicode-inspector-char-face
-        (vui-text label :face unicode-inspector-char-face)
+  (let* ((label (unicode-inspector--display-char char))
+         (face (unicode-inspector--display-face label unicode-inspector-char-face)))
+    (if face
+        (vui-text label :face face)
       label)))
 
 (defun unicode-inspector--pdf-icon ()
@@ -180,8 +220,9 @@ Uses direct replacement (not `display' properties) to avoid table misalignment."
 (defun unicode-inspector--block-table-cell (codepoint start end name)
   "Return the cell vnode for CODEPOINT within START..END NAME."
   (if (characterp codepoint)
-      (let ((label (unicode-inspector--display-char codepoint))
-            (face unicode-inspector-block-table-char-face))
+      (let* ((label (unicode-inspector--display-char codepoint))
+             (face (unicode-inspector--display-face
+                    label unicode-inspector-block-table-char-face)))
         (vui-button label
                     :face face
                     :on-click (lambda ()
