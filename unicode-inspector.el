@@ -368,8 +368,8 @@ INITIAL-QUERY seeds the Name filter."
 
 (defun unicode-inspector--char-row (char)
   "Build a table row for character CHAR."
-  (list (unicode-inspector--char-cell char)
-        (format "%04X" char)
+  (list (format "U+%04X" char)
+        (unicode-inspector--char-cell char)
         (unicode-inspector--encode-hex char 'utf-8)
         (unicode-inspector--encode-hex char 'utf-16le)
         (unicode-inspector--char-name char)
@@ -393,8 +393,8 @@ INITIAL-QUERY seeds the Name filter."
   (let ((rows (unicode-inspector--rows-from-input text)))
     (if rows
         (vui-table
-         :columns '((:header "Char" :min-width 9)
-                    (:header "Code" :min-width 4)
+         :columns '((:header "Code" :min-width 6)
+                    (:header "Char" :min-width 9)
                     (:header "UTF-8" :min-width 8)
                     (:header "UTF-16 LE" :min-width 9)
                     (:header "Name" :min-width 18)
