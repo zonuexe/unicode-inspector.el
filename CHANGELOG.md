@@ -2,14 +2,22 @@
 
 All notable changes of the `unicode-inspector.el` are documented in this file using the [Keep a Changelog](https://keepachangelog.com/) principles.
 
-## Unreleased
+<!-- ## Unreleased -->
+
+## [2025-12-30] 0.0.4
+
+### Added
+
+* Add `unicode-inspector-block-table` and `unicode-inspector-block-list` commands with completion.
+* Add configurable `unicode-inspector-display-replacements` and `unicode-inspector-control-replacements`.
 
 ### Changed
 
 * Renamed the block codepoint list command to `unicode-inspector-block-list`.
 * Re-opening existing inspector/list buffers now reuses or recreates buffers to avoid widget errors.
-* Use direct character replacement (not `display` properties) to avoid table misalignment.
-* Added display replacements for common invisible, zero-width, and bidi control characters.
+* Character display now uses replacement strings (some via `display` properties) and applies `font-lock-escape-face` for long labels.
+* Added replacements for common invisible, zero-width, and bidi control characters.
+* `unicode-inspector` now shows Code before Char, with `U+` codepoint formatting.
 
 ## [2025-12-30] 0.0.3
 

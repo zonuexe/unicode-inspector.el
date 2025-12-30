@@ -6,7 +6,7 @@
 ;; Created: 29 Dec 2025
 ;; Keywords: text
 ;; Homepage: https://github.com/zonuexe/unicode-inspector.el
-;; Version: 0.0.3
+;; Version: 0.0.4
 ;; Package-Requires: ((emacs "29.1") (vui "1.0.0"))
 ;; License: GPL-3.0-or-later
 
