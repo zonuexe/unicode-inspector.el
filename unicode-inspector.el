@@ -224,12 +224,12 @@ Uses direct replacement (not `display' properties) to avoid table misalignment."
              (face (unicode-inspector--display-face
                     label unicode-inspector-block-table-char-face)))
         (vui-button label
-                    :face face
-                    :on-click (lambda ()
-                                (unicode-inspector--open-block-list
-                                 start end name (unicode-inspector--char-name codepoint)))
-                    :help-echo (unicode-inspector--char-name codepoint)
-                    :no-decoration t))
+          :face face
+          :on-click (lambda ()
+                      (unicode-inspector--open-block-list
+                       start end name (unicode-inspector--char-name codepoint)))
+          :help-echo (unicode-inspector--char-name codepoint)
+          :no-decoration t))
     " "))
 
 (defun unicode-inspector--block-table-heading (name start end)
@@ -242,11 +242,11 @@ Uses direct replacement (not `display' properties) to avoid table misalignment."
      :spacing 1
      (vui-text label :face 'bold)
      (vui-button pdf-label
-                 :face pdf-face
-                 :on-click (lambda ()
-                             (browse-url (unicode-inspector-blocks-url start)))
-                 :help-echo (unicode-inspector-blocks-url start)
-                 :no-decoration t))))
+       :face pdf-face
+       :on-click (lambda ()
+                   (browse-url (unicode-inspector-blocks-url start)))
+       :help-echo (unicode-inspector-blocks-url start)
+       :no-decoration t))))
 
 (defun unicode-inspector--block-table-vnode (start end name)
   "Return a VUI table vnode for START..END with block NAME."
@@ -335,10 +335,10 @@ INITIAL-QUERY seeds the Name filter."
       (kill-buffer buf))
     (vui-mount
      (vui-component 'unicode-inspector--block-list
-                    :start start
-                    :end end
-                    :name name
-                    :initial-query initial-query)
+       :start start
+       :end end
+       :name name
+       :initial-query initial-query)
      buf-name)
     (unicode-inspector--enable-mode (get-buffer buf-name))))
 
