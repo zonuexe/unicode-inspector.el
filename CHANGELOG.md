@@ -2,11 +2,22 @@
 
 All notable changes of the `unicode-inspector.el` are documented in this file using the [Keep a Changelog](https://keepachangelog.com/) principles.
 
-## Unreleased
+<!-- ## Unreleased -->
+
+## [2025-12-30] 0.0.3
 
 ### Added
 
-* Add `unicode-inspector-char-face` custom variable for styling the Char column.
+* Add a block table view per Unicode block, plus a codepoint list view with Name search.
+* Add clickable block table cells that jump to the codepoint list filtered by Name.
+* Add ASCII control code names and glyph display for control characters.
+* Add `unicode-inspector-char-face` and `unicode-inspector-block-table-char-face` for styling.
+* Add `unicode-inspector-show-trailing-whitespace` to control trailing whitespace display.
+* Add `unicode-inspector-mode` with <kbd>q</kbd> bound to `quit-window`.
+
+### Changed
+
+* Block entries now provide both table navigation and a PDF link button with icons when available.
 
 ## [2025-12-30] 0.0.2
 
