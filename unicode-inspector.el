@@ -48,7 +48,14 @@
 
 (defcustom unicode-inspector-unique-input nil
   "When non-nil, inspect each character only once."
-  :type 'boolean)
+  :type 'boolean
+  :group 'unicode-inspector)
+
+(defcustom unicode-inspector-char-face 'emoji
+  "Face for characters shown in the Char column.
+When nil, no face is applied."
+  :type '(choice (const :tag "None" nil) face)
+  :group 'unicode-inspector)
 
 (defvar unicode-inspector--buffer-name "*Unicode Inspector*"
   "Buffer name for the Unicode Inspector UI.")
@@ -65,6 +72,12 @@
 (defun unicode-inspector--char-name (char)
   "Return Unicode name for CHAR or a fallback string."
   (or (get-char-code-property char 'name) "UNASSIGNED"))
+
+(defun unicode-inspector--char-cell (char)
+  "Return the Char column cell for CHAR."
+  (if unicode-inspector-char-face
+      (vui-text (string char) :face unicode-inspector-char-face)
+    (string char)))
 
 (defun unicode-inspector--char-block (char)
   "Return a block cell for CHAR with a chart PDF link."
@@ -84,7 +97,7 @@
 
 (defun unicode-inspector--char-row (char)
   "Build a table row for character CHAR."
-  (list (string char)
+  (list (unicode-inspector--char-cell char)
         (format "%04X" char)
         (unicode-inspector--encode-hex char 'utf-8)
         (unicode-inspector--encode-hex char 'utf-16le)

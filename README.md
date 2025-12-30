@@ -39,6 +39,14 @@ You can customize the behavior of `unicode-inspector` by adding the following co
 
 If non-nil, the inspector filters out duplicate characters from the input and displays each unique character only once.
 
+### `unicode-inspector-char-face`
+
+Controls the face applied to the Char column. Set to `nil` to disable styling.
+
+### `unicode-inspector-block-table-char-face`
+
+Controls the face applied to characters in block tables. Set to `nil` to disable styling.
+
 ## Copyright
 
 This package is licensed under [GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0).

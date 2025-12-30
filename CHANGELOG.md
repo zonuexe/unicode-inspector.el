@@ -2,6 +2,12 @@
 
 All notable changes of the `unicode-inspector.el` are documented in this file using the [Keep a Changelog](https://keepachangelog.com/) principles.
 
+## Unreleased
+
+### Added
+
+* Add `unicode-inspector-char-face` custom variable for styling the Char column.
+
 ## [2025-12-30] 0.0.2
 
 ### Added
