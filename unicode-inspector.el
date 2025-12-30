@@ -82,13 +82,26 @@ When nil, no face is applied."
 
 (defun unicode-inspector--char-name (char)
   "Return Unicode name for CHAR or a fallback string."
-  (or (get-char-code-property char 'name) "UNASSIGNED"))
+  (or (cdr (assq char unicode-inspector-ascii-control-names))
+      (get-char-code-property char 'name)
+      "UNASSIGNED"))
+
+(defun unicode-inspector--display-char (char)
+  "Return display string for CHAR, mapping ASCII controls to symbols."
+  (let ((base (string char)))
+    (cond
+     ((<= char #x1F)
+      (propertize base 'display (string (+ #x2400 char))))
+     ((= char #x7F)
+      (propertize base 'display (string #x2421)))
+     (t base))))
 
 (defun unicode-inspector--char-cell (char)
   "Return the Char column cell for CHAR."
-  (if unicode-inspector-char-face
-      (vui-text (string char) :face unicode-inspector-char-face)
-    (string char)))
+  (let ((label (unicode-inspector--display-char char)))
+    (if unicode-inspector-char-face
+        (vui-text label :face unicode-inspector-char-face)
+      label)))
 
 (defun unicode-inspector--pdf-icon ()
   "Return cached (label . face) for PDF buttons."
