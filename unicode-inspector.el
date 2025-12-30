@@ -234,6 +234,17 @@ When nil, no face is applied."
   "Return a buffer name for block codepoints NAME."
   (format "*Unicode Block Codepoints* %s" name))
 
+(defun unicode-inspector--blocks-alist ()
+  "Return an alist of block NAME to (START END NAME)."
+  (cl-loop for (start end name) in unicode-inspector-blocks
+           collect (cons name (list start end name))))
+
+(defun unicode-inspector--read-block (prompt)
+  "Read a Unicode block with PROMPT and return (START END NAME)."
+  (let* ((choices (unicode-inspector--blocks-alist))
+         (name (completing-read prompt choices nil t)))
+    (cdr (assoc name choices))))
+
 (defun unicode-inspector--block-codepoints-rows (start end query)
   "Return Codepoint/Char/Name rows for START..END filtered by QUERY."
   (let* ((needle (string-trim (or query "")))
@@ -277,6 +288,20 @@ When nil, no face is applied."
                     :initial-query initial-query)
      buf-name)
     (unicode-inspector--enable-mode (get-buffer buf-name))))
+
+;;;###autoload
+(defun unicode-inspector-block-table ()
+  "Open a Unicode block table selected via completion."
+  (interactive)
+  (pcase-let ((`(,start ,end ,name) (unicode-inspector--read-block "Block table: ")))
+    (unicode-inspector--open-block-table start end name)))
+
+;;;###autoload
+(defun unicode-inspector-block-codepoints ()
+  "Open a Unicode block codepoint list selected via completion."
+  (interactive)
+  (pcase-let ((`(,start ,end ,name) (unicode-inspector--read-block "Block list: ")))
+    (unicode-inspector--open-block-codepoints start end name)))
 
 (defun unicode-inspector--enable-mode (buffer)
   "Enable `unicode-inspector-mode' in BUFFER."

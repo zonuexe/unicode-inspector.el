@@ -24,6 +24,12 @@ You can install `unicode-inspector` using `package-vc-install` (available in Ema
                      :main-file "unicode-inspector.el"))
 ```
 
+## Commands
+
+- `M-x unicode-inspector` opens the main inspector UI.
+- `M-x unicode-inspector-block-table` opens a block table via completion.
+- `M-x unicode-inspector-block-codepoints` opens a block codepoint list via completion.
+
 ## Customization
 
 You can customize the behavior of `unicode-inspector` by adding the following configuration to your [Emacs Initialization File][]:
