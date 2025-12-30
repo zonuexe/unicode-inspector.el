@@ -279,7 +279,10 @@ When nil, no face is applied."
 
 (defun unicode-inspector--open-block-list (start end name &optional initial-query)
   "Open a Unicode block codepoint list for START..END with NAME."
-  (let ((buf-name (unicode-inspector--block-list-buffer-name name)))
+  (let* ((buf-name (unicode-inspector--block-list-buffer-name name))
+         (buf (get-buffer buf-name)))
+    (when (buffer-live-p buf)
+      (kill-buffer buf))
     (vui-mount
      (vui-component 'unicode-inspector--block-list
                     :start start
@@ -368,9 +371,12 @@ When nil, no face is applied."
 (defun unicode-inspector ()
   "Open the Unicode Inspector UI."
   (interactive)
-  (vui-mount (vui-component 'unicode-inspector--app)
-             unicode-inspector--buffer-name)
-  (unicode-inspector--enable-mode (get-buffer unicode-inspector--buffer-name)))
+  (let ((buf (get-buffer unicode-inspector--buffer-name)))
+    (if (buffer-live-p buf)
+        (pop-to-buffer buf)
+      (vui-mount (vui-component 'unicode-inspector--app)
+                 unicode-inspector--buffer-name)
+      (unicode-inspector--enable-mode (get-buffer unicode-inspector--buffer-name)))))
 
 (provide 'unicode-inspector)
 ;;; unicode-inspector.el ends here
