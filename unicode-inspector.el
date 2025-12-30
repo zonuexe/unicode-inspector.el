@@ -71,6 +71,16 @@ When nil, no face is applied."
 (defvar unicode-inspector--buffer-name "*Unicode Inspector*"
   "Buffer name for the Unicode Inspector UI.")
 
+(defvar-keymap unicode-inspector-mode-map
+  :doc "Keymap for `unicode-inspector-mode'."
+  "q" #'quit-window)
+
+(define-minor-mode unicode-inspector-mode
+  "Minor mode for Unicode Inspector buffers."
+  :init-value nil
+  :lighter " Unicode-Inspector"
+  :keymap unicode-inspector-mode-map)
+
 (defun unicode-inspector--bytes-to-hex (bytes)
   "Format BYTES as a space-separated hex string."
   (mapconcat (lambda (byte) (format "%02X" byte)) bytes " "))
@@ -205,6 +215,7 @@ When nil, no face is applied."
   (let ((buf (get-buffer-create (unicode-inspector--block-table-buffer-name name))))
     (with-current-buffer buf
       (vui-render (unicode-inspector--block-table-vnode start end name)))
+    (unicode-inspector--enable-mode buf)
     (pop-to-buffer buf)))
 
 (defun unicode-inspector--block-codepoints-buffer-name (name)
@@ -252,7 +263,14 @@ When nil, no face is applied."
                     :end end
                     :name name
                     :initial-query initial-query)
-     buf-name)))
+     buf-name)
+    (unicode-inspector--enable-mode (get-buffer buf-name))))
+
+(defun unicode-inspector--enable-mode (buffer)
+  "Enable `unicode-inspector-mode' in BUFFER."
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (unicode-inspector-mode 1))))
 
 (defun unicode-inspector--char-category (char)
   "Return general category for CHAR."
@@ -314,7 +332,8 @@ When nil, no face is applied."
   "Open the Unicode Inspector UI."
   (interactive)
   (vui-mount (vui-component 'unicode-inspector--app)
-             unicode-inspector--buffer-name))
+             unicode-inspector--buffer-name)
+  (unicode-inspector--enable-mode (get-buffer unicode-inspector--buffer-name)))
 
 (provide 'unicode-inspector)
 ;;; unicode-inspector.el ends here
