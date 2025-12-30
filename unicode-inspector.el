@@ -36,8 +36,10 @@
 ;;; Code:
 (require 'browse-url)
 (require 'emoji)
+(require 'subr-x)
 (require 'unicode-inspector-blocks)
 (require 'vui)
+(require 'nerd-icons nil t)
 (eval-when-compile
   (require 'cl-lib)
   (require 'pcase))
@@ -56,6 +58,15 @@
 When nil, no face is applied."
   :type '(choice (const :tag "None" nil) face)
   :group 'unicode-inspector)
+
+(defcustom unicode-inspector-block-table-char-face nil
+  "Face for characters shown in block table buffers.
+When nil, no face is applied."
+  :type '(choice (const :tag "None" nil) face)
+  :group 'unicode-inspector)
+
+(defvar unicode-inspector--pdf-icon-cache nil
+  "Cached (label . face) for the PDF button.")
 
 (defvar unicode-inspector--buffer-name "*Unicode Inspector*"
   "Buffer name for the Unicode Inspector UI.")
@@ -79,17 +90,31 @@ When nil, no face is applied."
       (vui-text (string char) :face unicode-inspector-char-face)
     (string char)))
 
+(defun unicode-inspector--pdf-icon ()
+  "Return cached (label . face) for PDF buttons."
+  (or unicode-inspector--pdf-icon-cache
+      (setq unicode-inspector--pdf-icon-cache
+            (let* ((icon (when (and (featurep 'nerd-icons)
+                                    (fboundp 'nerd-icons-icon-for-extension))
+                           (nerd-icons-icon-for-extension "pdf")))
+                   (face (and (stringp icon) (get-text-property 0 'face icon)))
+                   (label (or icon "[PDF]")))
+              (cons label face)))))
+
 (defun unicode-inspector--char-block (char)
   "Return a block cell for CHAR with a chart PDF link."
-  (let ((range (unicode-inspector-blocks-range-for char)))
-    (if (not range)
-        "No_Block"
-      (pcase-let ((`(,start ,_ ,name) range))
-        (vui-button name
-                    :on-click (lambda ()
-                                (browse-url (unicode-inspector-blocks-url start)))
-                    :help-echo (unicode-inspector-blocks-url start)
-                    :no-decoration t)))))
+  (if-let* ((range (unicode-inspector-blocks-range-for char)))
+      (pcase-let* ((`(,start ,end ,name) range)
+                   (`(,pdf-label . ,pdf-face) (unicode-inspector--pdf-icon)))
+        (vui-hstack
+         :spacing 1
+         (vui-button pdf-label
+           :face pdf-face
+           :on-click (lambda ()
+                       (browse-url (unicode-inspector-blocks-url start)))
+           :help-echo (unicode-inspector-blocks-url start)
+           :no-decoration t)))
+    "No_Block"))
 
 (defun unicode-inspector--char-category (char)
   "Return general category for CHAR."
