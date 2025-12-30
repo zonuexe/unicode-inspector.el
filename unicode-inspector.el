@@ -147,12 +147,18 @@ When nil, no face is applied."
         (end-col (ash end -4)))
     (cl-loop for col from start-col to end-col collect col)))
 
-(defun unicode-inspector--block-table-cell (codepoint)
-  "Return the cell vnode for CODEPOINT."
+(defun unicode-inspector--block-table-cell (codepoint start end name)
+  "Return the cell vnode for CODEPOINT within START..END NAME."
   (if (characterp codepoint)
-      (if unicode-inspector-block-table-char-face
-          (vui-text (string codepoint) :face unicode-inspector-block-table-char-face)
-        (string codepoint))
+      (let ((label (unicode-inspector--display-char codepoint))
+            (face unicode-inspector-block-table-char-face))
+        (vui-button label
+                    :face face
+                    :on-click (lambda ()
+                                (unicode-inspector--open-block-codepoints
+                                 start end name (unicode-inspector--char-name codepoint)))
+                    :help-echo (unicode-inspector--char-name codepoint)
+                    :no-decoration t))
     " "))
 
 (defun unicode-inspector--block-table-heading (name start end)
@@ -184,7 +190,8 @@ When nil, no face is applied."
                                (mapcar (lambda (col)
                                          (let ((codepoint (+ (ash row-base 4) col)))
                                            (if (<= start codepoint end)
-                                               (unicode-inspector--block-table-cell codepoint)
+                                               (unicode-inspector--block-table-cell
+                                                codepoint start end name)
                                              "")))
                                        col-nibbles)))
                        row-bases)))
@@ -199,6 +206,53 @@ When nil, no face is applied."
     (with-current-buffer buf
       (vui-render (unicode-inspector--block-table-vnode start end name)))
     (pop-to-buffer buf)))
+
+(defun unicode-inspector--block-codepoints-buffer-name (name)
+  "Return a buffer name for block codepoints NAME."
+  (format "*Unicode Block Codepoints* %s" name))
+
+(defun unicode-inspector--block-codepoints-rows (start end query)
+  "Return Codepoint/Char/Name rows for START..END filtered by QUERY."
+  (let* ((needle (string-trim (or query "")))
+         (needle (downcase needle)))
+    (cl-loop for codepoint from start to end
+             for name = (unicode-inspector--char-name codepoint)
+             when (or (string-empty-p needle)
+                      (string-match-p (regexp-quote needle) (downcase name)))
+             collect (list (format "U+%04X" codepoint)
+                           (unicode-inspector--char-cell codepoint)
+                           name))))
+
+(vui-defcomponent unicode-inspector--block-codepoints (start end name initial-query)
+  "Unicode block codepoint list."
+  :state ((query (or initial-query "")))
+  :render
+  (vui-vstack
+   :spacing 1
+   (unicode-inspector--block-table-heading name start end)
+   (vui-hstack
+    :spacing 1
+    (vui-text "Search (Name):")
+    (vui-field :size 40
+               :value query
+               :on-change (lambda (value)
+                            (vui-set-state :query value))))
+   (vui-table
+    :columns '((:header "Codepoint" :min-width 10)
+               (:header "Char" :min-width 4)
+               (:header "Name" :min-width 18))
+    :rows (unicode-inspector--block-codepoints-rows start end query))))
+
+(defun unicode-inspector--open-block-codepoints (start end name &optional initial-query)
+  "Open a Unicode block codepoint list for START..END with NAME."
+  (let ((buf-name (unicode-inspector--block-codepoints-buffer-name name)))
+    (vui-mount
+     (vui-component 'unicode-inspector--block-codepoints
+                    :start start
+                    :end end
+                    :name name
+                    :initial-query initial-query)
+     buf-name)))
 
 (defun unicode-inspector--char-category (char)
   "Return general category for CHAR."
