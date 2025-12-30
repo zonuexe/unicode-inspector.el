@@ -1,5 +1,5 @@
 (package "unicode-inspector"
-         "0.0.1"
+         "0.0.2"
          "Text to inspect Unicode properties")
 
 (website-url "https://github.com/zonuexe/unicode-inspector.el")
