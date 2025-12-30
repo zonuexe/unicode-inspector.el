@@ -177,7 +177,7 @@ When nil, no face is applied."
         (vui-button label
                     :face face
                     :on-click (lambda ()
-                                (unicode-inspector--open-block-codepoints
+                                (unicode-inspector--open-block-list
                                  start end name (unicode-inspector--char-name codepoint)))
                     :help-echo (unicode-inspector--char-name codepoint)
                     :no-decoration t))
@@ -230,9 +230,9 @@ When nil, no face is applied."
     (unicode-inspector--enable-mode buf)
     (pop-to-buffer buf)))
 
-(defun unicode-inspector--block-codepoints-buffer-name (name)
-  "Return a buffer name for block codepoints NAME."
-  (format "*Unicode Block Codepoints* %s" name))
+(defun unicode-inspector--block-list-buffer-name (name)
+  "Return a buffer name for block list NAME."
+  (format "*Unicode Block List* %s" name))
 
 (defun unicode-inspector--blocks-alist ()
   "Return an alist of block NAME to (START END NAME)."
@@ -245,7 +245,7 @@ When nil, no face is applied."
          (name (completing-read prompt choices nil t)))
     (cdr (assoc name choices))))
 
-(defun unicode-inspector--block-codepoints-rows (start end query)
+(defun unicode-inspector--block-list-rows (start end query)
   "Return Codepoint/Char/Name rows for START..END filtered by QUERY."
   (let* ((needle (string-trim (or query "")))
          (needle (downcase needle)))
@@ -257,7 +257,7 @@ When nil, no face is applied."
                            (unicode-inspector--char-cell codepoint)
                            name))))
 
-(vui-defcomponent unicode-inspector--block-codepoints (start end name initial-query)
+(vui-defcomponent unicode-inspector--block-list (start end name initial-query)
   "Unicode block codepoint list."
   :state ((query (or initial-query "")))
   :render
@@ -275,13 +275,13 @@ When nil, no face is applied."
     :columns '((:header "Codepoint" :min-width 10)
                (:header "Char" :min-width 4)
                (:header "Name" :min-width 18))
-    :rows (unicode-inspector--block-codepoints-rows start end query))))
+    :rows (unicode-inspector--block-list-rows start end query))))
 
-(defun unicode-inspector--open-block-codepoints (start end name &optional initial-query)
+(defun unicode-inspector--open-block-list (start end name &optional initial-query)
   "Open a Unicode block codepoint list for START..END with NAME."
-  (let ((buf-name (unicode-inspector--block-codepoints-buffer-name name)))
+  (let ((buf-name (unicode-inspector--block-list-buffer-name name)))
     (vui-mount
-     (vui-component 'unicode-inspector--block-codepoints
+     (vui-component 'unicode-inspector--block-list
                     :start start
                     :end end
                     :name name
@@ -297,11 +297,11 @@ When nil, no face is applied."
     (unicode-inspector--open-block-table start end name)))
 
 ;;;###autoload
-(defun unicode-inspector-block-codepoints ()
+(defun unicode-inspector-block-list ()
   "Open a Unicode block codepoint list selected via completion."
   (interactive)
   (pcase-let ((`(,start ,end ,name) (unicode-inspector--read-block "Block list: ")))
-    (unicode-inspector--open-block-codepoints start end name)))
+    (unicode-inspector--open-block-list start end name)))
 
 (defun unicode-inspector--enable-mode (buffer)
   "Enable `unicode-inspector-mode' in BUFFER."

@@ -2,7 +2,11 @@
 
 All notable changes of the `unicode-inspector.el` are documented in this file using the [Keep a Changelog](https://keepachangelog.com/) principles.
 
-<!-- ## Unreleased -->
+## Unreleased
+
+### Changed
+
+* Renamed the block codepoint list command to `unicode-inspector-block-list`.
 
 ## [2025-12-30] 0.0.3
 

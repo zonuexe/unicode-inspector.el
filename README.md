@@ -28,7 +28,7 @@ You can install `unicode-inspector` using `package-vc-install` (available in Ema
 
 - `M-x unicode-inspector` opens the main inspector UI.
 - `M-x unicode-inspector-block-table` opens a block table via completion.
-- `M-x unicode-inspector-block-codepoints` opens a block codepoint list via completion.
+- `M-x unicode-inspector-block-list` opens a block codepoint list via completion.
 
 ## Customization
 
