@@ -252,20 +252,22 @@ Uses direct replacement (not `display' properties) to avoid table misalignment."
   "Return a VUI table vnode for START..END with block NAME."
   (let* ((row-bases (unicode-inspector--block-table-columns start end))
          (col-nibbles (number-sequence 0 15))
-         (columns (cons (list :header "" :width 6)
-                        (mapcar (lambda (col)
-                                  (list :header (format "%X" col) :width 4 :align :center))
-                                col-nibbles)))
-         (rows (mapcar (lambda (row-base)
-                         (cons (format "%04X" row-base)
-                               (mapcar (lambda (col)
-                                         (let ((codepoint (+ (ash row-base 4) col)))
-                                           (if (<= start codepoint end)
-                                               (unicode-inspector--block-table-cell
-                                                codepoint start end name)
-                                             "")))
-                                       col-nibbles)))
-                       row-bases)))
+         (columns (vui-use-memo (col-nibbles)
+                    (cons (list :header "" :width 6)
+                          (mapcar (lambda (col)
+                                    (list :header (format "%X" col) :width 4 :align :center))
+                                  col-nibbles))))
+         (rows (vui-use-memo (row-bases start end name)
+                 (mapcar (lambda (row-base)
+                           (cons (format "%04X" row-base)
+                                 (mapcar (lambda (col)
+                                           (let ((codepoint (+ (ash row-base 4) col)))
+                                             (if (<= start codepoint end)
+                                                 (unicode-inspector--block-table-cell
+                                                  codepoint start end name)
+                                               "")))
+                                         col-nibbles)))
+                         row-bases))))
     (vui-vstack
      :spacing 1
      (unicode-inspector--block-table-heading name start end)
@@ -310,21 +312,23 @@ Uses direct replacement (not `display' properties) to avoid table misalignment."
   "Unicode block codepoint list."
   :state ((query (or initial-query "")))
   :render
-  (vui-vstack
-   :spacing 1
-   (unicode-inspector--block-table-heading name start end)
-   (vui-hstack
-    :spacing 1
-    (vui-text "Search (Name):")
-    (vui-field :size 40
-               :value query
-               :on-change (lambda (value)
-                            (vui-set-state :query value))))
-   (vui-table
-    :columns '((:header "Codepoint" :min-width 10)
-               (:header "Char" :min-width 4)
-               (:header "Name" :min-width 18))
-    :rows (unicode-inspector--block-list-rows start end query))))
+  (let ((rows (vui-use-memo (start end query)
+                (unicode-inspector--block-list-rows start end query))))
+    (vui-vstack
+     :spacing 1
+     (unicode-inspector--block-table-heading name start end)
+     (vui-hstack
+      :spacing 1
+      (vui-text "Search (Name):")
+      (vui-field :size 40
+                 :value query
+                 :on-change (lambda (value)
+                              (vui-set-state :query value))))
+     (vui-table
+      :columns '((:header "Codepoint" :min-width 10)
+                 (:header "Char" :min-width 4)
+                 (:header "Name" :min-width 18))
+      :rows rows))))
 
 (defun unicode-inspector--open-block-list (start end name &optional initial-query)
   "Open a Unicode block codepoint list for START..END with NAME.
