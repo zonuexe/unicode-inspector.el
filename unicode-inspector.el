@@ -304,9 +304,18 @@ Uses direct replacement (not `display' properties) to avoid table misalignment."
              for name = (unicode-inspector--char-name codepoint)
              when (or (string-empty-p needle)
                       (string-match-p (regexp-quote needle) (downcase name)))
-             collect (list (format "U+%04X" codepoint)
-                           (unicode-inspector--char-cell codepoint)
-                           name))))
+             collect (list :key codepoint
+                           :code (format "U+%04X" codepoint)
+                           :char (unicode-inspector--char-cell codepoint)
+                           :name name))))
+
+(defun unicode-inspector--block-list-row-vnode (row)
+  "Return a row vnode for ROW."
+  (vui-hstack
+   :spacing 1
+   (vui-box (vui-text (plist-get row :code)) :width 10)
+   (vui-box (plist-get row :char) :width 4)
+   (vui-text (plist-get row :name))))
 
 (vui-defcomponent unicode-inspector--block-list (start end name initial-query)
   "Unicode block codepoint list."
@@ -324,11 +333,15 @@ Uses direct replacement (not `display' properties) to avoid table misalignment."
                  :value query
                  :on-change (lambda (value)
                               (vui-set-state :query value))))
-     (vui-table
-      :columns '((:header "Codepoint" :min-width 10)
-                 (:header "Char" :min-width 4)
-                 (:header "Name" :min-width 18))
-      :rows rows))))
+     (vui-hstack
+      :spacing 1
+      (vui-box (vui-text "Codepoint" :face 'bold) :width 10)
+      (vui-box (vui-text "Char" :face 'bold) :width 4)
+      (vui-text "Name" :face 'bold))
+     (vui-list rows
+               #'unicode-inspector--block-list-row-vnode
+               (lambda (row) (plist-get row :key))
+               :spacing 0))))
 
 (defun unicode-inspector--open-block-list (start end name &optional initial-query)
   "Open a Unicode block codepoint list for START..END with NAME.
