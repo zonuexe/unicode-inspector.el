@@ -119,7 +119,8 @@ Uses direct replacement (not `display' properties) to avoid table misalignment."
 
 (defvar-keymap unicode-inspector-mode-map
   :doc "Keymap for `unicode-inspector-mode'."
-  "q" #'quit-window)
+  :parent vui-mode-map
+  "q" #'unicode-inspector-quit)
 
 (define-minor-mode unicode-inspector-mode
   "Minor mode for Unicode Inspector buffers."
@@ -131,6 +132,13 @@ Uses direct replacement (not `display' properties) to avoid table misalignment."
         (setq show-trailing-whitespace
               (not (eq unicode-inspector-show-trailing-whitespace :hide))))
     (setq show-trailing-whitespace (default-value 'show-trailing-whitespace))))
+
+(defun unicode-inspector-quit ()
+  "Quit the current buffer unless point is in a widget field."
+  (interactive)
+  (if (widget-field-at (point))
+      (call-interactively #'self-insert-command)
+    (quit-window)))
 
 (defun unicode-inspector--bytes-to-hex (bytes)
   "Format BYTES as a space-separated hex string."
